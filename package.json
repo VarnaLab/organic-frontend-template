@@ -1,0 +1,7 @@
+{
+  "name": "organic-frontend-template",
+  "version": "0.0.0",
+  "devDependencies": {
+    "express": "*"
+  }
+}
