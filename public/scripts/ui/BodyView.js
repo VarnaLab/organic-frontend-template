@@ -10,41 +10,39 @@
 
 define(['lib/jquery-2.0.3'], function ($) {
   'use strict';
-  function RootView(head, body) {
+  function View() {
     if (typeof this === 'undefined')
-      return new RootView();
+      return new View();
     this.root = document.createElement('div');
 
-    this.text = document.createElement('div');
-    this.root.appendChild(this.text);
-
-    this.root.appendChild(head);
-    this.root.appendChild(body);
+    this.root.innerText = 'targetArea';
+    this.root.style.width = '300px';
+    this.root.style.height = '100px;';
   }
 
-  RootView.prototype.set = function(data, callback) {
-    this.text.innerText = data.text;
+  View.prototype.set = function(data, callback) {
+    this.root.style.backgroundColor = data;
     callback(null, data);
   };
 
-  RootView.prototype.get = function(data, callback) {
+  View.prototype.get = function(data, callback) {
     callback(null, data);
   };
 
-  RootView.prototype.on = function (eventType, handlerFn) {
+  View.prototype.on = function (eventType, handlerFn) {
     var e = eventType.split(':');
     var target = (e[0])? $(e[0], this.root): $(this.root);
     target.on(e[1], handlerFn);
   };
-  RootView.prototype.destroy = function () {
+  View.prototype.destroy = function () {
     //TODO: free memory
     this.root = null;
   };
 
 
   return {
-    create: function (head, body, callback) {
-      var result = new RootView(head, body);
+    create: function (callback) {
+      var result = new View();
       callback(null, result);
     }
   };

@@ -8,8 +8,7 @@ define(['lib/eventtree/index', 'lib/constraints', 'ui/header', 'ui/body', 'ui/Ro
 
     var eventtree = EventTree.organic(eventbus, config.name);
     var tc = createTypeCheck();
-    var view = document.createElement('div');
-    var text = document.createElement('div');
+    var view = null
 
     EventTree.eld(eventtree, {
       ':create': function (event) {
@@ -22,12 +21,12 @@ define(['lib/eventtree/index', 'lib/constraints', 'ui/header', 'ui/body', 'ui/Ro
       },
       ':render': function (event) {
         var self = this;
-        self.emit('header','render', event.data, function (err, headerDom) {
-          self.emit('body', 'render', event.data, function (err, bodyDom) {
-            view.appendChild(text);
-            view.appendChild(headerDom);
-            view.appendChild(bodyDom);
-            event.callback(view);
+        self.emit('header','render', event.data, function (err1, headerDom) {
+          self.emit('body', 'render', event.data, function (err2, bodyDom) {
+            RootView.create(headerDom, bodyDom, function (e, v) {
+              view = v;
+              event.callback(e, v.root);
+            });
           });
         });
       },
@@ -35,8 +34,7 @@ define(['lib/eventtree/index', 'lib/constraints', 'ui/header', 'ui/body', 'ui/Ro
         var self = this;
         self.emit('header','updateView', null, function () {
           self.emit('body', 'updateView', null, function () {
-            text.innerText = event.data.text;
-            event.callback();
+            view.set(event.data, event.callback);
           });
         });
       },

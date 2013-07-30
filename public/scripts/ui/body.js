@@ -1,31 +1,30 @@
 /* global document: false */
-define(['lib/eventtree/index', 'lib/constraints'], function  (EventTree, createTypeCheck) {
+define(['lib/eventtree/index', 'lib/constraints', 'ui/BodyView'], function  (EventTree, createTypeCheck, BodyView) {
   'use strict';
   
   return function UIBody (eventbus, config) {
     if (typeof this === 'undefined')
       return new UIBody(eventbus, config);
 
-    var etorg = EventTree.organic(eventbus, config.name);
-    var eventtree = EventTree.children(etorg, function () { return []; });
+    var eventtree = EventTree.organic(eventbus, config.name);
     var tc = createTypeCheck();
     var alternatives = ['green', 'red'];
     var alterIndex = 0;
-    var view = document.createElement('div');
+    var view = null;
 
     EventTree.eld(eventtree, {
       ':create': function (event) {
         event.callback(null, null);
       },
       ':render': function (event) {
-        view.innerText = 'targetArea';
-        view.style.width = '300px';
-        view.style.height = '100px;';
-        event.callback(null, view);
+        console.log('render');
+        BodyView.create(function (e, v) {
+          view = v;
+          event.callback(e, v.root);
+        });
       },
       ':updateView': function (event) {
-        view.style.backgroundColor = alternatives[alterIndex];
-        event.callback();
+        view.set(alternatives[alterIndex], event.callback);
       },
       ':updateModel': function (event) {
         event.callback(null, null);

@@ -1,15 +1,14 @@
 /*global document: false*/
-define(['lib/eventtree/index', 'lib/constraints'], function  (EventTree, createTypeCheck) {
+define(['lib/eventtree/index', 'lib/constraints', 'ui/HeadView'], function  (EventTree, createTypeCheck, HeadView) {
   'use strict';
   
   return function UIHead (eventbus, config) {
     if (typeof this === 'undefined')
       return new UIHead(eventbus, config);
 
-    var etorg = EventTree.organic(eventbus, config.name);
-    var eventtree = EventTree.children(etorg, function () { return []; });
+    var eventtree = EventTree.organic(eventbus, config.name);
     var tc = createTypeCheck();
-    var view = document.createElement('div');
+    var view = null;
 
     EventTree.eld(eventtree, {
       ':create': function (event) {
@@ -17,15 +16,14 @@ define(['lib/eventtree/index', 'lib/constraints'], function  (EventTree, createT
       },
       ':render': function (event) {
         var self = this;
-        view.style.width = '300px';
-        view.style.height = '100px;';
-        view.style.backgroundColor = '#BAE3FA';
-        view.innerHTML = 'start event';
-        view.onclick = function () {
-          console.log('view event started');
-          self.emit('','action', { state:'success' }, function () {});
-        };
-        event.callback(null, view);
+        HeadView.create(function (e, v) {
+          view = v;
+          view.on(':click',function () {
+            console.log('view event started');
+            self.emit('','action', { state:'success' }, function () {});
+          });
+          event.callback(e, v.root)
+        });
       },
       ':updateView': function (event) {
         event.callback();
